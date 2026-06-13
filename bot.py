@@ -1,55 +1,51 @@
+import os
 import requests
-from datetime import datetime
+import smtplib
+from email.message import EmailMessage
 
-def get_weather():
+CITY = "Thiruvananthapuram"
 
-    url = (
-        "https://api.open-meteo.com/v1/forecast"
-        "?latitude=8.5241"
-        "&longitude=76.9366"
-        "&current=temperature_2m,weather_code"
-    )
+API_KEY = os.getenv("OPENWEATHER_API_KEY")
+EMAIL = "evanpauljacob27@gmail.com"
+APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD")
 
-    response = requests.get(url)
-    data = response.json()
+url = (
+    f"https://api.openweathermap.org/data/2.5/weather"
+    f"?q={CITY}&appid={API_KEY}&units=metric"
+)
 
-    temperature = data["current"]["temperature_2m"]
+data = requests.get(url).json()
 
-    return f"{temperature}°C"
+temp = data["main"]["temp"]
+weather = data["weather"][0]["main"]
 
+print(f"Temperature: {temp}°C")
+print(f"Weather: {weather}")
 
-def get_quote():
+if temp > 35 or weather.lower() in ["rain", "drizzle", "thunderstorm"]:
 
-    response = requests.get(
-        "https://zenquotes.io/api/random"
-    )
+    msg = EmailMessage()
 
-    data = response.json()[0]
+    msg["Subject"] = "⚠ Weather Alert"
+    msg["From"] = EMAIL
+    msg["To"] = EMAIL
 
-    return f'"{data["q"]}" - {data["a"]}'
+    msg.set_content(
+        f"""
+Weather Alert for {CITY}
 
+Temperature: {temp}°C
+Condition: {weather}
 
-def build_report():
-
-    today = datetime.now().strftime("%Y-%m-%d")
-
-    report = f"""
-PULSE DAILY SUMMARY
-===================
-
-Date: {today}
-
-Weather:
-{get_weather()}
-
-Quote:
-{get_quote()}
+Stay prepared!
 """
+    )
 
-    return report
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+        smtp.login(EMAIL, APP_PASSWORD)
+        smtp.send_message(msg)
 
+    print("Alert email sent!")
 
-with open("daily_report.txt", "w", encoding="utf-8") as file:
-    file.write(build_report())
-
-print("Report generated successfully!")
+else:
+    print("No alert needed.")
