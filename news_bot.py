@@ -8,7 +8,7 @@ APP_PASSWORD = os.getenv("EMAIL_APP_PASSWORD")
 
 feeds = [
     ("BBC", "http://feeds.bbci.co.uk/news/rss.xml"),
-    ("Reuters", "https://feeds.reuters.com/reuters/topNews"),
+    ("CNN", "http://rss.cnn.com/rss/edition.rss"),
     ("The Hindu", "https://www.thehindu.com/news/feeder/default.rss")
 ]
 
