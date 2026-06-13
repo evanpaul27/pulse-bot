@@ -22,7 +22,7 @@ weather = data["weather"][0]["main"]
 print(f"Temperature: {temp}°C")
 print(f"Weather: {weather}")
 
-if temp > 35 or weather.lower() in ["rain", "drizzle", "thunderstorm"]:
+if temp > 20 or weather.lower() in ["rain", "drizzle", "thunderstorm"]:
 
     msg = EmailMessage()
 
